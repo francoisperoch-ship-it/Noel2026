@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ami invisible de Noël</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rouge:#b3202f; --rouge-fonce:#8c1522; --vert:#1f5e45; --vert-clair:#e4f0e9;
+    --creme:#fbf6ee; --or:#d9a441; --encre:#2a2320; --gris:#6f655e; --ligne:#e8ddd0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Nunito',system-ui,sans-serif; font-size:20px; line-height:1.45;
+    color:var(--encre); min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,.12) 0 2px, transparent 3px) 0 0/60px 60px,
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,.10) 0 1.5px, transparent 2.5px) 0 0/45px 45px,
+      linear-gradient(180deg, var(--vert) 0%, #174a36 100%);
+    padding:24px 16px 48px;
+  }
+  .page{max-width:520px; margin:0 auto}
+  header{text-align:center; color:#fff; margin:8px 0 22px}
+  .sapin{font-size:56px; line-height:1}
+  h1{font-family:'Fraunces',serif; font-weight:800; font-size:34px; margin:8px 0 4px; letter-spacing:.3px}
+  header p{margin:0; opacity:.85; font-size:18px}
+
+  .carte{
+    background:var(--creme); border-radius:22px; padding:26px 22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25); margin-bottom:20px; position:relative;
+  }
+  .carte h2{font-family:'Fraunces',serif; font-size:24px; margin:0 0 14px; color:var(--vert)}
+  label{display:block; font-weight:800; margin-bottom:10px}
+
+  input[type=text]{
+    width:100%; font:inherit; font-size:22px; padding:16px 18px;
+    border:2px solid var(--ligne); border-radius:14px; background:#fff; color:var(--encre);
+  }
+  input[type=text]:focus{outline:none; border-color:var(--vert); box-shadow:0 0 0 4px var(--vert-clair)}
+
+  .btn{
+    display:block; width:100%; font:inherit; font-size:22px; font-weight:800;
+    padding:18px; border:0; border-radius:16px; cursor:pointer; margin-top:16px;
+    background:var(--rouge); color:#fff; box-shadow:0 5px 0 var(--rouge-fonce);
+    transition:transform .08s;
+  }
+  .btn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--rouge-fonce)}
+  .btn[disabled]{opacity:.6; cursor:wait}
+  .btn.vert{background:var(--vert); box-shadow:0 5px 0 #123a2a}
+  .btn.discret{background:transparent; color:var(--vert); box-shadow:none; border:2px solid var(--vert); font-size:19px; padding:14px}
+
+  .erreur{color:var(--rouge); font-weight:700; margin-top:12px; display:none}
+
+  /* Révélation */
+  .revele{text-align:center; border:3px dashed var(--or)}
+  .revele .petit{color:var(--gris); font-size:18px; margin:0}
+  .nom-dest{
+    font-family:'Fraunces',serif; font-weight:800; font-size:46px; color:var(--rouge);
+    margin:6px 0 4px; animation:pop .7s cubic-bezier(.2,1.6,.4,1) both;
+  }
+  .cadeau{font-size:48px; animation:pop .6s .15s both}
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .liste-dest{list-style:none; padding:0; margin:18px 0 0; text-align:left}
+  .liste-dest li{
+    background:#fff; border:2px solid var(--ligne); border-radius:14px;
+    padding:12px 14px 12px 46px; margin-bottom:10px; position:relative; word-break:break-word;
+  }
+  .liste-dest li::before{content:"🎁"; position:absolute; left:13px; top:11px}
+  .vide{
+    background:#fff3d6; border-radius:14px; padding:16px; margin-top:18px;
+    font-size:19px; text-align:left;
+  }
+
+  /* Ma liste */
+  .idee{display:flex; gap:8px; margin-bottom:10px; align-items:center}
+  .idee .num{font-weight:800; color:var(--gris); width:26px; flex:none; text-align:right}
+  .idee input{font-size:20px; padding:14px}
+  .suppr{
+    flex:none; width:48px; height:48px; border-radius:12px; border:2px solid var(--ligne);
+    background:#fff; font-size:22px; cursor:pointer; color:var(--gris);
+  }
+  .ajout{
+    font:inherit; font-weight:700; color:var(--vert); background:none; border:none;
+    padding:8px 0; cursor:pointer; font-size:19px;
+  }
+  .aide{color:var(--gris); font-size:17px; margin:-4px 0 14px}
+
+  .bravo{
+    display:none; background:var(--vert-clair); color:var(--vert); border-radius:14px;
+    padding:14px 16px; margin-top:16px; font-weight:700; font-size:19px;
+  }
+  .pas-moi{text-align:center; margin-top:4px}
+  .pas-moi button{font:inherit; font-size:17px; color:#fff; opacity:.8; background:none; border:none; text-decoration:underline; cursor:pointer}
+
+  .cache{display:none}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="sapin">🎄</div>
+    <h1>Ami invisible de Noël</h1>
+    <p>Chut… c'est un secret !</p>
+  </header>
+
+  <!-- Étape 1 : le prénom -->
+  <section id="etape-nom" class="carte">
+    <label for="prenom">Écris ton prénom :</label>
+    <input type="text" id="prenom" autocomplete="off" autocapitalize="words" placeholder="Ton prénom">
+    <button class="btn" id="btn-entrer">C'est moi ! 🎅</button>
+    <p class="erreur" id="erreur-nom">Je ne trouve pas ce prénom. Vérifie l'orthographe et réessaie 🙂</p>
+  </section>
+
+  <!-- Étape 2 : tout le reste -->
+  <div id="etape-suite" class="cache">
+    <section class="carte revele">
+      <p class="petit">Bonjour <strong id="moi"></strong> ! Tu offres un cadeau à…</p>
+      <div class="nom-dest" id="dest"></div>
+      <div class="cadeau">🎁</div>
+      <div id="zone-liste-dest"></div>
+      <button class="btn discret" id="btn-rafraichir">🔄 Voir si sa liste a changé</button>
+    </section>
+
+    <section class="carte">
+      <h2>Et toi, qu'aimerais-tu recevoir ?</h2>
+      <p class="aide">Écris une idée par case. Tu pourras revenir la modifier quand tu veux.</p>
+      <div id="mes-idees"></div>
+      <button class="ajout" id="btn-ajout">➕ Ajouter une idée</button>
+      <button class="btn vert" id="btn-valider">✅ Valider ma liste</button>
+      <div class="bravo" id="bravo">Ta liste est enregistrée ! 🎉<br>La personne qui te fait ton cadeau la verra en ouvrant le lien.</div>
+    </section>
+
+    <div class="pas-moi"><button id="btn-pas-moi">Ce n'est pas moi / changer de prénom</button></div>
+  </div>
+</div>
+
+<script>
+/* ---------- Accès au "coffre" Google ---------- */
+const COFFRE = 'https://script.google.com/macros/s/AKfycbz0E9JkcXt2XUJ8dgMzvZxe00HyduH_6oXOoZcKvWjAr8_xfHC3UtZGoN0AsD893iFz/exec';
+
+async function appeler(fn, nom, idees){
+  let rep;
+  if (fn === 'enregistrer'){
+    // envoi "texte simple" : pas de blocage du navigateur, pas de compte Google
+    rep = await fetch(COFFRE, { method:'POST', body: JSON.stringify({ nom: nom, idees: idees }) });
+  } else {
+    rep = await fetch(COFFRE + '?action=' + fn + '&nom=' + encodeURIComponent(nom) + '&t=' + Date.now());
+  }
+  if (!rep.ok) throw new Error('reseau');
+  return rep.json();
+}
+
+/* ---------- Petits outils ---------- */
+const $ = id => document.getElementById(id);
+function retenir(nom){ try{ nom ? localStorage.setItem('ami-invisible', nom) : localStorage.removeItem('ami-invisible'); }catch(e){} }
+function souvenir(){ try{ return localStorage.getItem('ami-invisible') || ''; }catch(e){ return ''; } }
+
+let moi = null, destinataire = null;
+
+/* ---------- Étape 1 ---------- */
+async function entrer(nom){
+  const btn = $('btn-entrer');
+  btn.disabled = true; btn.textContent = 'Un instant…';
+  $('erreur-nom').style.display = 'none';
+  try{
+    const r = await appeler('connexion', nom);
+    if (!r.ok){ $('erreur-nom').style.display = 'block'; retenir(''); return; }
+    moi = r.prenom; destinataire = r.destinataire;
+    retenir(moi);
+    afficherSuite(r);
+  }catch(e){
+    $('erreur-nom').textContent = 'Petit souci de connexion. Réessaie dans un instant.';
+    $('erreur-nom').style.display = 'block';
+  }finally{
+    btn.disabled = false; btn.textContent = "C'est moi ! 🎅";
+  }
+}
+
+$('btn-entrer').onclick = () => { const v = $('prenom').value; if (v.trim()) entrer(v); };
+$('prenom').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-entrer').click(); });
+
+/* ---------- Étape 2 ---------- */
+function afficherSuite(r){
+  $('etape-nom').classList.add('cache');
+  $('etape-suite').classList.remove('cache');
+  $('moi').textContent = r.prenom;
+  $('dest').textContent = r.destinataire;
+  afficherListeDest(r.listeDestinataire);
+  remplirMesIdees(r.maListe);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function afficherListeDest(liste){
+  const zone = $('zone-liste-dest');
+  zone.innerHTML = '';
+  if (!liste || !liste.length){
+    const p = document.createElement('div');
+    p.className = 'vide';
+    p.textContent = destinataire + " n'a pas encore donné d'idées cadeau. Reviens voir un peu plus tard ! ⏳";
+    zone.appendChild(p);
+    return;
+  }
+  const titre = document.createElement('p');
+  titre.style.margin = '16px 0 0'; titre.style.fontWeight = '800';
+  titre.textContent = 'Ses idées cadeau :';
+  const ul = document.createElement('ul'); ul.className = 'liste-dest';
+  liste.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+  zone.append(titre, ul);
+}
+
+$('btn-rafraichir').onclick = async () => {
+  const b = $('btn-rafraichir'); b.disabled = true; b.textContent = 'Je regarde…';
+  try{ afficherListeDest(await appeler('listeDe', moi)); }
+  finally{ b.disabled = false; b.textContent = '🔄 Voir si sa liste a changé'; }
+};
+
+/* Ma liste */
+function ligneIdee(valeur){
+  const div = document.createElement('div'); div.className = 'idee';
+  const num = document.createElement('span'); num.className = 'num';
+  const inp = document.createElement('input'); inp.type = 'text'; inp.value = valeur || '';
+  inp.placeholder = 'Une idée de cadeau'; inp.maxLength = 300;
+  inp.oninput = () => $('bravo').style.display = 'none';
+  const x = document.createElement('button'); x.className = 'suppr'; x.textContent = '✕';
+  x.setAttribute('aria-label', 'Effacer cette idée');
+  x.onclick = () => {
+    if ($('mes-idees').children.length > 1) div.remove(); else inp.value = '';
+    numeroter(); $('bravo').style.display = 'none';
+  };
+  div.append(num, inp, x);
+  return div;
+}
+function numeroter(){ [...$('mes-idees').children].forEach((d,i) => d.querySelector('.num').textContent = (i+1) + '.'); }
+function remplirMesIdees(liste){
+  const zone = $('mes-idees'); zone.innerHTML = '';
+  const valeurs = (liste && liste.length) ? liste.slice() : [];
+  while (valeurs.length < 3) valeurs.push('');
+  valeurs.forEach(v => zone.appendChild(ligneIdee(v)));
+  numeroter();
+}
+$('btn-ajout').onclick = () => {
+  if ($('mes-idees').children.length >= 15) return;
+  const l = ligneIdee(''); $('mes-idees').appendChild(l); numeroter(); l.querySelector('input').focus();
+};
+
+$('btn-valider').onclick = async () => {
+  const idees = [...$('mes-idees').querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+  const b = $('btn-valider'); b.disabled = true; b.textContent = 'J\'enregistre…';
+  try{
+    const r = await appeler('enregistrer', moi, idees);
+    if (r && r.ok){ $('bravo').style.display = 'block'; remplirMesIdees(idees); }
+    else alert("Oups, ta liste n'a pas pu être enregistrée. Réessaie.");
+  }catch(e){
+    alert("Petit souci de connexion. Réessaie dans un instant.");
+  }finally{
+    b.disabled = false; b.textContent = '✅ Valider ma liste';
+  }
+};
+
+$('btn-pas-moi').onclick = () => {
+  retenir(''); moi = null;
+  $('etape-suite').classList.add('cache');
+  $('etape-nom').classList.remove('cache');
+  $('prenom').value = ''; $('prenom').focus();
+};
+
+/* Si la personne est déjà venue, on la reconnaît */
+const deja = souvenir();
+if (deja){ $('prenom').value = deja; entrer(deja); }
+</script>
+</body>
+</html>
